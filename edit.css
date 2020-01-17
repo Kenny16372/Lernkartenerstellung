@@ -1,0 +1,140 @@
+html, body{
+	overflow-x: hidden;
+    padding: 0;
+    margin: 0;
+}
+
+.fenster{
+	position: relative;
+	padding: 0  5px 5px 0;
+	width: calc(100% - 5px);
+	height: calc(100% - 5px);
+	cursor: move;
+}
+
+.fenster:active{
+	background-color: RGBA(0, 0, 0, 0);
+}
+
+.rahmen{
+	position: absolute;
+	background-color: RGBA(0, 0, 0, 0);
+	border: 1px solid black;
+	resize: both;
+	overflow: auto;
+}
+
+#bildContainer{
+	position: relative;
+	width: 75vw;
+	float: right;
+	padding: 1rem;
+}
+
+img{
+	position: relative;
+	width: 100%;
+	user-select: none;
+}
+
+.edit{
+	position: fixed;
+	top: 50vh;
+	width: 20vw;
+	line-height: 2rem;
+    margin-left: 1vw;
+	z-index: 1;
+}
+
+[type="file"] {
+  border: 0;
+  clip: rect(0, 0, 0, 0);
+  height: 1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute !important;
+  white-space: nowrap;
+  width: 1px;
+}
+
+[type="file"] + label {
+  cursor: pointer;
+  display: inline-block;
+  border: 1px solid black;
+  border-radius: 1rem;
+  padding: 0 10px;
+}
+
+[type="file"]:hover + label {
+  background: LightGray;
+}
+
+
+#plus{
+	font-size: 4vw;
+	position: fixed;
+	top: 1vw;
+	width: 4vw;
+	height: 4vw;
+	border: 1px solid black;
+    border-radius: 35%;
+	vertical-align: middle;
+	text-align: center;
+	display: table-cell;
+	line-height: 4vw;
+	cursor: pointer;
+	user-select: none;
+}
+
+#plus:active{
+	border-left: 1px solid black;
+	border-top: 1px solid black;
+	border-right: 2px solid black;
+	border-bottom: 2px solid black;
+}
+
+#rotateCW{
+	font-size: 4vw;
+	position: fixed;
+	top: 6vw;
+	width: 4vw;
+	height: 4vw;
+	border: 1px solid black;
+    border-radius: 35%;
+	vertical-align: middle;
+	text-align: center;
+	display: table-cell;
+	line-height: 4vw;
+	cursor: pointer;
+	user-select: none;
+}
+
+#rotateCW:active{
+	border-left: 1px solid black;
+	border-top: 1px solid black;
+	border-right: 2px solid black;
+	border-bottom: 2px solid black;
+}
+
+#rotateCCW{
+	font-size: 4vw;
+	position: fixed;
+	top: 11vw;
+	width: 4vw;
+	height: 4vw;
+	border: 1px solid black;
+    border-radius: 35%;
+    vertical-align: middle;
+	text-align: center;
+	display: table-cell;
+	line-height: 4vw;
+	cursor: pointer;
+	user-select: none;
+}
+
+#rotateCCW:active{
+	border-left: 1px solid black;
+	border-top: 1px solid black;
+	border-right: 2px solid black;
+	border-bottom: 2px solid black;
+}
