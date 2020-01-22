@@ -21,7 +21,7 @@ html, body{
 	background-color: RGBA(0, 0, 0, 0);
 	border: 1px solid black;
 	resize: both;
-	overflow: auto;
+	overflow: hidden;
 }
 
 #bildContainer{
@@ -29,6 +29,7 @@ html, body{
 	width: 75vw;
 	float: right;
 	padding: 1rem;
+	overflow: hidden;
 }
 
 img{

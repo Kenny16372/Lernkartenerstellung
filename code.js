@@ -1,5 +1,6 @@
 var data;
 var compressed;
+const epsFactor = 1;
 
 //Make the DIV element draggagle:
 
@@ -201,9 +202,9 @@ function plus(pos){
         rahmen.style = "left: 50%; top: 50%; width: 20%; height: 20%";
     }
     else{
-        var width = pos[1] - pos[0];
-        var height = pos[3] - pos[2];
-        rahmen.style = "left: calc(1rem + " + pos[0] + "px); top: calc(1rem + " + pos[2] + "px); width: " + width + "px; height: " + height + "px;";
+        var width = pos.x1 - pos.x0;
+        var height = pos.y1 - pos.y0;
+        rahmen.style = "left: calc(1rem + " + pos.x0 + "px); top: calc(1rem + " + pos.y0 + "px); width: " + width + "px; height: " + height + "px;";
     }
     var fenster = document.createElement("div");
     fenster.classList.add("fenster");
@@ -280,16 +281,8 @@ function loaded(){
     var btn = document.getElementById("click");
     btn.addEventListener('click', click);
 
-    inputsChanged();
     changed();
-}
-
-var params = {
-    threshold: 150,
-    eps: 29,
-    minPts: 7,
-    dia: 5,
-    amt: 0
+    compressed = compress(document.getElementById("bild").src);
 }
 
 
@@ -315,9 +308,87 @@ function click(){
     outputRects = {};
 
     compressed = compress(data);
+    var imageCom = new Image();
+    imageCom.src = compressed;
 
-    textSegment(compressed, params.threshold, params.eps, params.minPts, params.dia, params.amt);
-    getOutput();
+    var progress = document.getElementById("progress");
+    progress.style.visibility = "visible";
+
+    Tesseract.recognize(imageCom, "eng", { logger: m => {if(m.status == "recognizing text"){
+         document.getElementById("progress").value = m.progress;
+        }
+        }}).then(function(result){
+        var progress = document.getElementById("progress");
+        progress.style.visibility = "hidden";
+        
+        var words = result.data.words;
+        let img = document.getElementById("bild");
+        let ratioX = img.width / imageCom.width;
+        let ratioY = img.height / imageCom.height;
+
+        var arrCenter = [];
+        var arrW = [];
+        var arrH = [];
+        var map = new Map();
+
+        for(var i = 0; i < words.length; i++){
+            if(words[i].confidence > 0 && words[i].text.length >= 2){
+                var center = [(words[i].bbox.x1 + words[i].bbox.x0) / 2, (words[i].bbox.y1 + words[i].bbox.y0) / 2];
+                var width = words[i].bbox.x1 - words[i].bbox.x0;
+                var height = words[i].bbox.y1 - words[i].bbox.y0;
+                var centerStr = center[0].toString() + " " + center[1].toString();
+                arrCenter.push(center);
+                arrW.push(width);
+                arrH.push(height);
+                map.set(centerStr, words[i].bbox);
+            }
+        }
+        var sum = 0;
+        for(var i = 0; i < arrW.length; i++){
+            sum += arrW[i];
+        }
+
+        for(var i = 0; i < arrH.length; i++){
+            sum += arrH[i];
+        }
+
+        var mean = sum / (arrW.length + arrH.length) * epsFactor;
+
+        var clustered = DBSCAN(arrCenter, mean, 1);
+
+        for (const k in clustered) {
+            if (clustered.hasOwnProperty(k)) {
+                const element = clustered[k];
+                var l, r, t, b;
+                for(var i = 0; i < element.length; i++){
+                    var key = element[i][0] + " " + element[i][1];
+                    var bbox = map.get(key);
+                    if(i == 0){
+                        l = bbox.x0;
+                        r = bbox.x1;
+                        t = bbox.y0;
+                        b = bbox.y1;
+                    }
+                    else{
+                        if(bbox.x0 < l){
+                            l = bbox.x0;
+                        }
+                        if(bbox.x1 > r){
+                            r = bbox.x1;
+                        }
+                        if(bbox.y0 < t){
+                            t = bbox.y0;
+                        }
+                        if(bbox.y1 > b){
+                            b = bbox.y1;
+                        }
+                    }
+                    
+                }
+                plus({x0: l * ratioX - 0.1 * (r - l), x1: r * ratioX + 0.1 * (r - l), y0: t * ratioY - 0.1 * (b - t), y1: b * ratioY + 0.1 * (b - t)});
+            }
+        }
+    });
 }
 
 function compress(url){
@@ -333,46 +404,6 @@ function compress(url){
     context.clearRect( 0, 0, context.canvas.width, context.canvas.height);
     context.drawImage(image, 0, 0, context.canvas.width, context.canvas.height);
     return canvas.toDataURL();
-}
-
-function getOutput(){
-    if(isEmpty(outputRects)){
-        window.setTimeout(getOutput, 100);
-    }
-    else{
-        drawBoxes();
-    }
-
-    function isEmpty(obj) {
-        for(var key in obj) {
-            if(obj.hasOwnProperty(key))
-                return false;
-        }
-        return true;
-    }
-}
-
-function drawBoxes(){
-    var compressedImg = new Image();
-    compressedImg.src = compressed;
-
-    let img = document.getElementById("bild");
-    let ratioX = img.width / compressedImg.width;
-    let ratioY = img.height / compressedImg.height;
-    for(key in outputRects){
-        var box = outputRects[key];
-        box[0] = box[0] * ratioX;
-        box[2] = box[2] * ratioX;
-        box[1] = box[1] * ratioY;
-        box[3] = box[3] * ratioY;
-        plus(box);
-    }
-}
-
-function inputsChanged(){
-    params.threshold = Number(document.getElementById('threshold').value);
-    params.eps = Number(document.getElementById('eps').value);
-    params.minPts = Number(document.getElementById('minPts').value);
 }
 
 makeDraggable();

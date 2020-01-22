@@ -17,28 +17,11 @@
     <div class="edit">
         <input type="file" accept="image/*" id="file" onchange="changed();"/><label for="file">Bild ändern</label><br>
         Titel: <input id="title"/>
-        <button onclick="save();">Speichern</button>
+        <button onclick="save();">Speichern</button><br>
+        <progress id="progress" value="0" max="1"></progress>
         <button id="click">Automatik</button><br>
-
-        Anzahl der Felder:<br><input onchange="inputsChanged()" type="range" min="0" max="250" step="any" value="150" list="tickmarks" id="threshold">
-        <datalist id="tickmarks">
-          <option value="0" label="wenige"></option>
-          <option value="50"></option>
-          <option value="100"></option>
-          <option value="150" label="mittel"></option>
-          <option value="200"></option>
-          <option value="250" label="viele"></option>
-        </datalist>
-        <br>
-        Zusammenfassen:<br><input type="range" onchange="inputsChanged()" min="1" max="50" step="any" value="29" id="eps"><br>
-        Anzahl Buchstaben pro Feld:<br><input type="range" onchange="inputsChanged()" min="1" max="10" step="3" value="7" list="minPts" id="minPts"><br>
-        <datalist id="minPts">
-          <option value="1" label="wenige"></option>
-          <option value="4"></option>
-          <option value="7"></option>
-          <option value="10" label="viele"></option>
-        </datalist>
     </div>
+    <script src='https://unpkg.com/tesseract.js@v2.0.2/dist/tesseract.min.js'></script>
     <script src="ITSegmenter.js"></script>
     <script src="code.js"></script>
 </body>
